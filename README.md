@@ -77,9 +77,10 @@ rl-agent/
 │   ├── q_learning_agent.py   # tabular Q-learning agent
 │   └── dqn_agent.py           # DQN agent (PyTorch)
 ├── train_q_learning.py        # full training run + policy printout + plot
-├── train_dqn.py                # full training run + reward plot
+├── train_dqn.py                # full training run + reward plot + saves best model checkpoint
+├── run_best_dqn.py              # loads the saved best model and evaluates it (no training)
 ├── demo.py                     # quick, shortened version of both, for a fast sanity check
-├── outputs/                    # saved training plots land here
+├── outputs/                    # saved training plots + best_dqn_model.pt land here
 ├── requirements.txt
 └── README.md
 ```
@@ -136,6 +137,29 @@ python3 train_dqn.py
 
 Trains for 300 episodes, prints progress every 20 episodes, and saves a
 reward plot to `outputs/dqn_rewards.png`.
+
+**It also automatically saves a model checkpoint** to
+`outputs/best_dqn_model.pt` every time the rolling average reward hits a
+new high during training — not just whatever the agent looks like at the
+very end. This matters because DQN training isn't monotonic: performance
+can peak partway through and then dip afterward (see "catastrophic
+forgetting" note below), so the *final* episode isn't necessarily the
+agent's best version. At the end, the script prints both the final
+average and the best average reached, along with which episode the best
+one came from.
+
+## Running the saved best model (no training)
+
+```bash
+cd /Users/YOUR-USERNAME/Downloads/rl-agent
+source venv/bin/activate
+python3 run_best_dqn.py
+```
+
+Loads `outputs/best_dqn_model.pt` (must run `train_dqn.py` at least once
+first) and runs it for 10 episodes with no exploration and no further
+learning — just to see how the best-performing version of the agent
+actually plays. Prints the reward for each episode plus the average.
 
 ## What "good" results look like
 
